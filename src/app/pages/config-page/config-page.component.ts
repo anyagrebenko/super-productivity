@@ -30,9 +30,8 @@ import {
   GlobalConfigState,
   GlobalSectionConfig,
 } from '../../features/config/global-config.model';
-import { firstValueFrom, from, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProjectCfgFormKey } from '../../features/project/project.model';
 import { T } from '../../t.const';
 import { versions } from '../../../environments/versions';
@@ -46,8 +45,6 @@ import { ConfigSectionComponent } from '../../features/config/config-section/con
 import { ConfigSoundFormComponent } from '../../features/config/config-sound-form/config-sound-form.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EXPERIMENTAL_APP_FEATURE_KEYS } from '../../features/config/form-cfgs/app-features-form.const';
-import { SyncProviderManager } from '../../op-log/sync-providers/provider-manager.service';
-import { SyncConfigService } from '../../imex/sync/sync-config.service';
 import { PluginManagementComponent } from '../../plugins/ui/plugin-management/plugin-management.component';
 import { PluginBridgeService } from '../../plugins/plugin-bridge.service';
 import { createPluginShortcutFormItems } from '../../features/config/form-cfgs/plugin-keyboard-shortcuts';
@@ -66,7 +63,6 @@ import { DialogConfirmComponent } from '../../ui/dialog-confirm/dialog-confirm.c
 import { MatTab, MatTabGroup, MatTabLabel } from '@angular/material/tabs';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatButton } from '@angular/material/button';
 import { LocalBackupService } from '../../imex/local-backup/local-backup.service';
 
 @Component({
@@ -85,7 +81,6 @@ import { LocalBackupService } from '../../imex/local-backup/local-backup.service
     MatTabLabel,
     MatIcon,
     MatTooltip,
-    MatButton,
   ],
 })
 export class ConfigPageComponent implements OnInit {
@@ -104,7 +99,6 @@ export class ConfigPageComponent implements OnInit {
   private readonly _updateCheckService = inject(UpdateCheckService);
 
   readonly configService = inject(GlobalConfigService);
-  readonly syncSettingsService = inject(SyncConfigService);
   readonly taskWidgetSettingsService = inject(TaskWidgetSettingsService);
   readonly focusModeLocalSettingsService = inject(FocusModeLocalSettingsService);
 
@@ -129,34 +123,6 @@ export class ConfigPageComponent implements OnInit {
   // still runs to completion in the background; only the result is ignored.
   // try/catch keeps the stream alive when isReady() rejects (otherwise the
   // observable error would kill the subscription and freeze the status).
-  syncStatus = toSignal(
-    this.syncSettingsService.syncSettingsForm$.pipe(
-      switchMap((sync) => {
-        const providerId = sync.isEnabled
-          ? (sync.syncProvider as SyncProviderId | null)
-          : null;
-        const isEncrypted = !!sync.isEncryptionEnabled;
-        if (!providerId) {
-          return of({ providerId: null, needsAuth: false, isEncrypted });
-        }
-        return from(
-          (async () => {
-            const provider = await this._providerManager.getProviderById(providerId);
-            const requiresAuth = !!provider?.getAuthHelper;
-            try {
-              const isAuthed = !!(await provider?.isReady());
-              return { providerId, needsAuth: requiresAuth && !isAuthed, isEncrypted };
-            } catch {
-              // Don't claim a non-OAuth provider needs auth — only surface
-              // the auth pill if the provider could plausibly require it.
-              return { providerId, needsAuth: requiresAuth, isEncrypted };
-            }
-          })(),
-        );
-      }),
-    ),
-    { initialValue: { providerId: null, needsAuth: false, isEncrypted: false } },
-  );
 
   appVersion: string = getAppVersionStr();
   versions?: typeof versions = versions;
@@ -306,16 +272,6 @@ export class ConfigPageComponent implements OnInit {
 
     // Trigger change detection
     this._cd.detectChanges();
-  }
-
-  async openSyncCfgDialog(): Promise<void> {
-    const { DialogSyncCfgComponent } =
-      await import('../../imex/sync/dialog-sync-cfg/dialog-sync-cfg.component');
-    this._matDialog.open(DialogSyncCfgComponent);
-  }
-
-  triggerSync(): void {
-    this._syncWrapperService.sync(true);
   }
 
   async saveGlobalCfg($event: {
