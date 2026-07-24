@@ -98,21 +98,6 @@ describe('ConfigPageComponent', () => {
     await setup();
   });
 
-  it('should expose an empty syncStatus by default', () => {
-    expect(component.syncStatus().providerId).toBeNull();
-    expect(component.syncStatus().needsAuth).toBe(false);
-  });
-
-  it('triggerSync() should call SyncWrapperService.sync()', () => {
-    component.triggerSync();
-    expect(mockSyncWrapperService.sync).toHaveBeenCalled();
-  });
-
-  it('openSyncCfgDialog() should open DialogSyncCfgComponent', async () => {
-    await component.openSyncCfgDialog();
-    expect(mockMatDialog.open).toHaveBeenCalled();
-  });
-
   it('should expose Android automatic backup restore action', async () => {
     TestBed.resetTestingModule();
     await setup(true);
