@@ -58,7 +58,6 @@ import { SyncWrapperService } from '../../imex/sync/sync-wrapper.service';
 import { UserProfileService } from '../../features/user-profile/user-profile.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogDisableProfilesConfirmationComponent } from '../../features/user-profile/dialog-disable-profiles-confirmation/dialog-disable-profiles-confirmation.component';
-import { SyncProviderId } from '../../op-log/sync-providers/provider.const';
 import { DialogConfirmComponent } from '../../ui/dialog-confirm/dialog-confirm.component';
 import { MatTab, MatTabGroup, MatTabLabel } from '@angular/material/tabs';
 import { MatIcon } from '@angular/material/icon';
@@ -86,7 +85,6 @@ import { LocalBackupService } from '../../imex/local-backup/local-backup.service
 export class ConfigPageComponent implements OnInit {
   private readonly _cd = inject(ChangeDetectorRef);
   private readonly _route = inject(ActivatedRoute);
-  private readonly _providerManager = inject(SyncProviderManager);
   private readonly _syncWrapperService = inject(SyncWrapperService);
   private readonly _pluginBridgeService = inject(PluginBridgeService);
   private readonly _snackService = inject(SnackService);
