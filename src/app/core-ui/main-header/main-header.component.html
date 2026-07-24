@@ -47,41 +47,6 @@
         </button>
       }
 
-      @if (isSyncIconEnabled()) {
-        <button
-          class="sync-btn"
-          matTooltip="{{ syncTooltip() | translate }}"
-          (click)="onSyncButtonClick()"
-          (longPress)="setupSync()"
-          (contextmenu)="$event.preventDefault(); setupSync()"
-          mat-icon-button
-        >
-          @if (syncIsEnabledAndReady()) {
-            @if (isOnline()) {
-              @if (syncState() === 'ERROR') {
-                <mat-icon>sync_problem</mat-icon>
-              } @else {
-                <mat-icon [class.spin]="isSyncInProgress()">sync</mat-icon>
-              }
-              @if (hasNoPendingOps()) {
-                @if (superSyncIsConfirmedInSync()) {
-                  <mat-icon class="sync-state-ico">done_all</mat-icon>
-                } @else {
-                  <mat-icon class="sync-state-ico">check</mat-icon>
-                }
-              }
-            } @else {
-              <mat-icon>wifi_off</mat-icon>
-            }
-          } @else {
-            <mat-icon>sync_disabled</mat-icon>
-          }
-        </button>
-      }
-
-      <plugin-work-context-header-btns></plugin-work-context-header-btns>
-      <plugin-header-btns></plugin-header-btns>
-
       @if (isUserProfilesEnabled()) {
         <user-profile-button></user-profile-button>
       }
