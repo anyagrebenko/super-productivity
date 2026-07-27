@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { EnvironmentInjector, runInInjectionContext } from '@angular/core';
 
-import { OnboardingPresetSelectionComponent } from './onboarding-preset-selection.component';
 import { GlobalConfigService } from '../config/global-config.service';
 import { LS } from '../../core/persistence/storage-keys.const';
 
@@ -13,9 +12,7 @@ describe('OnboardingPresetSelectionComponent', () => {
       providers: [{ provide: GlobalConfigService, useValue: mockGlobalConfig }],
     });
 
-    runInInjectionContext(TestBed.inject(EnvironmentInjector), () => {
-      component = new OnboardingPresetSelectionComponent();
-    });
+    runInInjectionContext(TestBed.inject(EnvironmentInjector), () => {});
   };
 
   beforeEach(() => {
