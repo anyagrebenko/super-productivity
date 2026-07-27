@@ -82,7 +82,6 @@ export class MainHeaderComponent implements OnDestroy {
   readonly taskService = inject(TaskService);
   readonly layoutService = inject(LayoutService);
   readonly simpleCounterService = inject(SimpleCounterService);
-  readonly syncWrapperService = inject(SyncWrapperService);
   readonly globalConfigService = inject(GlobalConfigService);
   private readonly _snackService = inject(SnackService);
   private readonly _router = inject(Router);
