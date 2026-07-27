@@ -20,6 +20,7 @@ import { LS } from '../../core/persistence/storage-keys.const';
 })
 export class OnboardingPresetSelectionComponent {
   private _globalConfigService = inject(GlobalConfigService);
+  private _matDialog = inject(MatDialog);
   presets = ONBOARDING_PRESETS;
   presetSelected = output<void>();
   dismissed = output<void>();
