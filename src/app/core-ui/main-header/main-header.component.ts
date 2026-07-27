@@ -19,7 +19,6 @@ import { WorkContextService } from '../../features/work-context/work-context.ser
 import { expandFadeHorizontalAnimation } from '../../ui/animations/expand.ani';
 import { SimpleCounterService } from '../../features/simple-counter/simple-counter.service';
 import { SimpleCounter } from '../../features/simple-counter/simple-counter.model';
-import { SyncWrapperService } from '../../imex/sync/sync-wrapper.service';
 import { SnackService } from '../../core/snack/snack.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { GlobalConfigService } from '../../features/config/global-config.service';
@@ -35,7 +34,6 @@ import { isOnline$ } from '../../util/is-online';
 import { Store } from '@ngrx/store';
 import { DataInitStateService } from '../../core/data-init/data-init-state.service';
 import { showFocusOverlay } from '../../features/focus-mode/store/focus-mode.actions';
-import { SyncStatus } from '../../op-log/sync-exports';
 import { PluginHeaderBtnsComponent } from '../../plugins/ui/plugin-header-btns.component';
 import { PluginWorkContextHeaderBtnsComponent } from '../../plugins/ui/plugin-work-context-header-btns.component';
 import { PluginSidePanelBtnsComponent } from '../../plugins/ui/plugin-side-panel-btns.component';
@@ -145,45 +143,10 @@ export class MainHeaderComponent implements OnDestroy {
   isShowIssuePanel = computed(() => this.layoutService.isShowIssuePanel());
   isShowNotes = computed(() => this.layoutService.isShowNotes());
   isShowScheduleDayPanel = computed(() => this.layoutService.isShowScheduleDayPanel());
-  syncIsEnabledAndReady = toSignal(this.syncWrapperService.isEnabledAndReady$);
-  syncState = toSignal(this.syncWrapperService.syncState$);
-  isSyncInProgress = toSignal(this.syncWrapperService.isSyncInProgress$);
-  hasNoPendingOps = toSignal(this.syncWrapperService.hasNoPendingOps$, {
-    initialValue: false,
-  });
-  superSyncIsConfirmedInSync = toSignal(
-    this.syncWrapperService.superSyncIsConfirmedInSync$,
-    { initialValue: false },
-  );
   focusModeConfig = toSignal(
     this.globalConfigService.cfg$.pipe(map((cfg) => cfg?.focusMode)),
   );
   isOnline = toSignal(isOnline$);
-  // State-aware tooltip for the sync button: the icon alone (sync_problem /
-  // wifi_off) signals a problem but never explains it. Surfacing the state in
-  // the tooltip is the ambient counterpart to suppressing the transient
-  // network snack on automatic syncs — a persistent problem stays discoverable
-  // by glancing at / hovering the always-present header button.
-  // Precedence mirrors the icon @if cascade in the template (disabled →
-  // offline → error → syncing → in-sync); keep the two in sync.
-  syncTooltip = computed(() => {
-    if (!this.syncIsEnabledAndReady()) {
-      return T.MH.TRIGGER_SYNC;
-    }
-    if (!this.isOnline()) {
-      return T.MH.SYNC_STATE.OFFLINE;
-    }
-    if (this.syncState() === 'ERROR') {
-      return T.MH.SYNC_STATE.ERROR;
-    }
-    if (this.isSyncInProgress()) {
-      return T.MH.SYNC_STATE.SYNCING;
-    }
-    if (this.hasNoPendingOps()) {
-      return T.MH.SYNC_STATE.IN_SYNC;
-    }
-    return T.MH.TRIGGER_SYNC;
-  });
   focusSummaryToday = computed(() =>
     this._metricService.getFocusSummaryForDay(this._dateService.todayStr()),
   );
@@ -292,48 +255,7 @@ export class MainHeaderComponent implements OnDestroy {
     return item.id;
   }
 
-  sync(): void {
-    this.syncWrapperService.sync(true).then((r) => {
-      if (
-        r === SyncStatus.UpdateLocal ||
-        r === SyncStatus.UpdateRemoteAll ||
-        r === SyncStatus.UpdateRemote
-      ) {
-        this._snackService.open({ type: 'SUCCESS', msg: T.F.SYNC.S.SUCCESS_VIA_BUTTON });
-      } else if (r === SyncStatus.InSync) {
-        this._snackService.open({
-          type: 'SUCCESS',
-          msg: T.F.SYNC.S.ALREADY_IN_SYNC,
-        });
-      }
-    });
-  }
-
-  onSyncButtonClick(): void {
-    const ready = !!this.syncIsEnabledAndReady();
-    if (ready) {
-      this.sync();
-    } else {
-      this.setupSync();
-    }
-  }
-
   private dialogSyncCfgRef: MatDialogRef<unknown> | null = null;
-
-  async setupSync(): Promise<void> {
-    // to prevent multiple dialogs on longpress from android
-    if (this.dialogSyncCfgRef) {
-      return;
-    }
-    const { DialogSyncCfgComponent } =
-      await import('../../imex/sync/dialog-sync-cfg/dialog-sync-cfg.component');
-    this.dialogSyncCfgRef = this.matDialog.open(DialogSyncCfgComponent);
-    this._subs.add(
-      this.dialogSyncCfgRef.afterClosed().subscribe(() => {
-        this.dialogSyncCfgRef = null;
-      }),
-    );
-  }
 
   isCounterRunning(counters: SimpleCounter[]): boolean {
     return !!(counters && counters.find((counter) => counter.isOn));
