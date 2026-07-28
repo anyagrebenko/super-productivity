@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MatButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
 import { T } from '../../t.const';
 import { TranslatePipe } from '@ngx-translate/core';
 import { IS_APPLE_APP_STORE } from '../../app.constants';
@@ -10,7 +8,7 @@ import { IS_APPLE_APP_STORE } from '../../app.constants';
   templateUrl: './donate-page.component.html',
   styleUrls: ['./donate-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatButton, MatIcon, TranslatePipe],
+  imports: [TranslatePipe],
   standalone: true,
 })
 export class DonatePageComponent {

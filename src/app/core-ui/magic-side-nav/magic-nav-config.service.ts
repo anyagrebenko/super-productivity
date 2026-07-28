@@ -104,9 +104,6 @@ export class MagicNavConfigService {
   private readonly isBoardsEnabled = computed(
     () => this._configService.appFeatures().isBoardsEnabled,
   );
-  private readonly isDonatePageEnabled = computed(
-    () => this._configService.appFeatures().isDonatePageEnabled,
-  );
   private readonly isHabitsEnabled = computed(
     () => this._configService.appFeatures().isHabitsEnabled,
   );
@@ -252,20 +249,6 @@ export class MagicNavConfigService {
       },
 
       // Help Menu (rendered as mat-menu)
-      // Not allowed to display donation stuff on the iOS or Mac App Store per
-      // App Store guidelines (Guideline 3.1.1)
-      ...(this.isDonatePageEnabled() && !IS_APPLE_APP_STORE
-        ? [
-            {
-              type: 'route',
-              id: 'donate',
-              label: T.MH.DONATE,
-              icon: 'favorite',
-              route: '/donate',
-              featureConfigKey: 'isDonatePageEnabled',
-            } as NavItem,
-          ]
-        : []),
       {
         type: 'menu',
         id: 'help',
