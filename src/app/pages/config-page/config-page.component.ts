@@ -45,7 +45,6 @@ import { ConfigSectionComponent } from '../../features/config/config-section/con
 import { ConfigSoundFormComponent } from '../../features/config/config-sound-form/config-sound-form.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EXPERIMENTAL_APP_FEATURE_KEYS } from '../../features/config/form-cfgs/app-features-form.const';
-import { PluginManagementComponent } from '../../plugins/ui/plugin-management/plugin-management.component';
 import { PluginBridgeService } from '../../plugins/plugin-bridge.service';
 import { createPluginShortcutFormItems } from '../../features/config/form-cfgs/plugin-keyboard-shortcuts';
 import { PluginShortcutCfg } from '../../plugins/plugin-api.model';
@@ -74,7 +73,6 @@ import { LocalBackupService } from '../../imex/local-backup/local-backup.service
     ConfigSectionComponent,
     ConfigSoundFormComponent,
     TranslatePipe,
-    PluginManagementComponent,
     MatTabGroup,
     MatTab,
     MatTabLabel,

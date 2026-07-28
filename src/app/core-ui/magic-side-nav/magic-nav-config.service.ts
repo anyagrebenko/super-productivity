@@ -36,7 +36,6 @@ import {
 import { GlobalConfigService } from '../../features/config/global-config.service';
 import { AppFeaturesConfig } from '../../features/config/global-config.model';
 import { SnackService } from '../../core/snack/snack.service';
-import { IS_APPLE_APP_STORE } from '../../app.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -276,19 +275,6 @@ export class MagicNavConfigService {
             icon: 'feedback',
             href: 'https://github.com/super-productivity/super-productivity/discussions',
           },
-          // Not allowed to display donation stuff on the iOS or Mac App Store
-          // per App Store guidelines (Guideline 3.1.1)
-          ...(!IS_APPLE_APP_STORE
-            ? [
-                {
-                  type: 'href' as const,
-                  id: 'help-contribute',
-                  label: T.MH.HM.CONTRIBUTE,
-                  icon: 'volunteer_activism',
-                  href: 'https://github.com/super-productivity/super-productivity/blob/master/CONTRIBUTING.md',
-                },
-              ]
-            : []),
           {
             type: 'href',
             id: 'help-reddit',
