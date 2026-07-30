@@ -7,7 +7,7 @@ jobs:
   build-and-verify-dmg:
     runs-on: macos-15
     env:
-      NODE_OPTIONS: --max-old-space-size=8192
+      NODE_OPTIONS: --max-old-space-size=16384
       UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
       UNSPLASH_CLIENT_ID: ${{ secrets.UNSPLASH_CLIENT_ID }}
 
@@ -73,10 +73,15 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
 
+      - name: Check node memory
+        run: |
+          echo: "$NODE_OPTIONS"
+          node -e "console.log(process.env.NODE_OPTIONS)"
+
       - name: Generate environment & build sources
         run: |
           npm run env
-          npm run build
+          NODE_OPTIONS="--max-old-space-size=12288" npm run build
 
       - name: Build Developer ID DMG
         env:
