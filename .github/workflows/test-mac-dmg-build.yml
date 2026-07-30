@@ -73,15 +73,17 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
 
-      - name: Check node memory
+      - name: Debug node memory
         run: |
-          echo: "$NODE_OPTIONS"
-          node -e "console.log(process.env.NODE_OPTIONS)"
+          node -p "process.version"
+          node -p "process.env.NODE_OPTIONS"
+          node -e "console.log(require('os').totalmem()/1024/1024/1024 + ' GB RAM')"
 
       - name: Generate environment & build sources
+        env: NODE_OPTIONS="--max-old-space-size=16384"
         run: |
           npm run env
-          NODE_OPTIONS="--max-old-space-size=12288" npm run build
+          npm run build -- --parallel=1
 
       - name: Build Developer ID DMG
         env:
