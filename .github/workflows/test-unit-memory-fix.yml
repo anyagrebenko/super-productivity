@@ -1,0 +1,45 @@
+name: Test Unit Memory Fix
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-unit:
+    runs-on: macos-15
+
+    env:
+      NODE_OPTIONS: --max-old-space-size=24576
+      UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
+      UNSPLASH_CLIENT_ID: ${{ secrets.UNSPLASH_CLIENT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Electron build environment
+        uses: ./.github/actions/setup-electron-build
+
+      - name: Install npm packages
+        uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 15
+          shell: bash
+          command: npm install @nx/nx-darwin-arm64 dmg-license && npm i || { rm -rf node_modules/electron; exit 1; }
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Debug memory
+        run: |
+          node -v
+          node -p "process.env.NODE_OPTIONS"
+          node -e "console.log('RAM:', require('os').totalmem()/1024/1024/1024, 'GB')"
+
+      - name: Test Unit
+        env:
+          NODE_OPTIONS: --max-old-space-size=24576
+        run: npm run test -- --maxWorkers=1
