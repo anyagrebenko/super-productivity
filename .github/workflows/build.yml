@@ -111,9 +111,9 @@ jobs:
         uses: browser-actions/setup-chrome@v1
 
       - name: Test Unit
-        env:
-          NODE_OPTIONS: --max-old-space-size=16384
-        run: npm run test
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=16384"
+          npm run test
 
       - name: Build Frontend for E2E
         run: npm run buildFrontend:e2e
