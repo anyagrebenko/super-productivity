@@ -19,6 +19,10 @@ jobs:
       - name: Setup Electron build environment
         uses: ./.github/actions/setup-electron-build
 
+      - name: Check node memory
+        run: |
+          echo "NODE_OPTIONS=$NODE_OPTIONS"
+          node -e "console.log(require('v8').getHeapStatistics().heap_size_limit /1024 /1024 +' MB')"
       # @nx/nx-darwin-arm64 + dmg-license aren't in package.json (npm's
       # optional-dep bug skips them), so install them explicitly. That install
       # and `npm i` both run electron's flaky postinstall binary download, so
@@ -80,7 +84,8 @@ jobs:
           node -e "console.log(require('os').totalmem()/1024/1024/1024 + ' GB RAM')"
 
       - name: Generate environment & build sources
-        env: NODE_OPTIONS="--max-old-space-size=16384"
+        env:
+          NODE_OPTIONS: --max-old-space-size=16384
         run: |
           npm run env
           npm run build -- --parallel=1
