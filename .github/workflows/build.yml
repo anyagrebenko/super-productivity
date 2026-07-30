@@ -107,7 +107,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
       - name: Test Unit
+        env:
+          NODE_OPTIONS: --max-old-space-size=16384
         run: npm run test
 
       - name: Build Frontend for E2E
